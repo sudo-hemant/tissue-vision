@@ -1,25 +1,27 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { usePathname, useRouter } from "next/navigation";
+
 import { getFoldersOrFilesList } from "@/helpers/api.helpers";
+import { getFilesWithRelativePath } from "@/helpers/general.helpers";
+
 import Body from "@/components/Body";
-import Folder from "@/components/Folder";
 
 const Projects = ({ params: { clientId } }) => {
-  const [response, setResponse] = useState({});
+  // const [response, setResponse] = useState({});
   const [projectsList, setProjectsList] = useState([]);
-  console.log("🚀 ~ Projects ~ projectsList:", projectsList);
 
   const router = useRouter();
   const pathname = usePathname();
 
   const getProjectsList = async () => {
     const response = await getFoldersOrFilesList({ prefix: clientId });
+    const subFolders = getFilesWithRelativePath(response.data?.subFolders, 1);
 
-    setResponse(response);
-    setProjectsList(response.data?.subFolders);
+    // setResponse(response);
+    setProjectsList(subFolders);
   };
 
   useEffect(() => {
@@ -32,44 +34,12 @@ const Projects = ({ params: { clientId } }) => {
     router.push(`${pathname}/${projectId}/datasets`);
   };
 
-  const getProjectId = (folderName = "") => {
-    const splittedFolderName = folderName.split("/");
-    return splittedFolderName[1];
-  };
-
   return (
-    <Body subHeaderText="Projects">
-      <div className="flex gap-4">
-        {projectsList.map((projectFolder) => {
-          const temp = getProjectId(projectFolder);
-          const projectId = temp.replace("/", "");
-
-          return (
-            <Folder
-              key={projectId}
-              text={projectId}
-              onClick={handleProjectClick}
-            />
-          );
-        })}
-      </div>
-    </Body>
-
-    // <div>
-    //   {projectsList.map((projectFolder) => {
-
-    //     return (
-    //       <div>
-    //         <button
-    //           key={projectId}
-    //           onClick={(e) => handleProjectClick(e, projectId)}
-    //         >
-    //           {projectId}
-    //         </button>
-    //       </div>
-    //     );
-    //   })}
-    // </div>
+    <Body
+      subHeaderText="Projects"
+      dataList={projectsList}
+      handleFolderClick={handleProjectClick}
+    />
   );
 };
 

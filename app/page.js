@@ -1,25 +1,41 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 import { getFoldersOrFilesList } from "@/helpers/api.helpers";
-import Folder from "@/components/Folder";
-import SubHeader from "@/components/SubHeader";
+import { getFilesWithRelativePath } from "@/helpers/general.helpers";
+
 import Body from "@/components/Body";
 
 const Clients = () => {
-  const [response, setResponse] = useState({});
+  // const [response, setResponse] = useState({});
   const [clientsList, setClientsList] = useState([]);
 
   const router = useRouter();
 
   const getClientsList = async () => {
     const response = await getFoldersOrFilesList();
+    const subFolders = getFilesWithRelativePath(response.data?.subFolders, 0);
 
-    setResponse(response);
-    setClientsList([...response.data?.subFolders]);
-    setClientsList((a) => [...a, "ACT-002-898-890-897-987/", "ACT-003/"]);
+    // setResponse(response);
+    setClientsList(subFolders);
+
+    // FIXME: TEMPORARY
+    setClientsList((a) => [
+      ...a,
+      "ACT-002/",
+      "ACT-003/",
+      "ACT-004/",
+      "ACT-005/",
+      "ACT-006/",
+      "ACT-007/",
+      "ACT-008/",
+      "ACT-009/",
+      "ACT-010/",
+      "ACT-011/",
+    ]);
   };
 
   useEffect(() => {
@@ -33,21 +49,11 @@ const Clients = () => {
   };
 
   return (
-    <Body subHeaderText="Clients">
-      <div className="flex gap-4">
-        {clientsList.map((client) => {
-          const clientId = client.replace("/", "");
-
-          return (
-            <Folder
-              key={clientId}
-              text={clientId}
-              onClick={handleClientClick}
-            />
-          );
-        })}
-      </div>
-    </Body>
+    <Body
+      subHeaderText="Clients"
+      dataList={clientsList}
+      handleFolderClick={handleClientClick}
+    />
   );
 };
 

@@ -1,12 +1,17 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { usePathname, useRouter } from "next/navigation";
+
 import { getFoldersOrFilesList } from "@/helpers/api.helpers";
+import { getFilesWithRelativePath } from "@/helpers/general.helpers";
+
+import Body from "@/components/Body";
 
 const Datasets = ({ params: { clientId, projectId } }) => {
-  const [datasetsList, setDatasetsList] = useState({});
+  // const [response, setResponse] = useState({});
+  const [datasetsList, setDatasetsList] = useState([]);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -15,8 +20,10 @@ const Datasets = ({ params: { clientId, projectId } }) => {
     const response = await getFoldersOrFilesList({
       prefix: `${clientId}/${projectId}`,
     });
+    const subFolders = getFilesWithRelativePath(response.data?.subFolders, 2);
 
-    setDatasetsList(response);
+    // setResponse(response);
+    setDatasetsList(subFolders);
   };
 
   useEffect(() => {
@@ -29,28 +36,12 @@ const Datasets = ({ params: { clientId, projectId } }) => {
     router.push(`${pathname}/${datasetId}/files`);
   };
 
-  const getProjectId = (datasetFolder = "") => {
-    const splittedFolderName = datasetFolder.split("/");
-    return splittedFolderName[2];
-  };
-
   return (
-    <div>
-      {datasetsList.data?.subFolders?.map((datasetFolder) => {
-        const datasetId = getProjectId(datasetFolder);
-
-        return (
-          <div>
-            <button
-              key={datasetId}
-              onClick={(e) => handleDatasetClick(e, datasetId)}
-            >
-              {datasetId}
-            </button>
-          </div>
-        );
-      })}
-    </div>
+    <Body
+      subHeaderText="Datasets"
+      dataList={datasetsList}
+      handleFolderClick={handleDatasetClick}
+    />
   );
 };
 

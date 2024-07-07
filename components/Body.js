@@ -1,9 +1,12 @@
+import FolderList from "./FolderList";
 import SubHeader from "./SubHeader";
 
-const Body = ({ children, subHeaderText }) => {
+const Body = ({ children, subHeaderText, dataList, handleFolderClick }) => {
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-6 w-full">
       <SubHeader text={subHeaderText} />
+
+      <FolderList dataList={dataList} handleFolderClick={handleFolderClick} />
 
       {children}
     </div>
