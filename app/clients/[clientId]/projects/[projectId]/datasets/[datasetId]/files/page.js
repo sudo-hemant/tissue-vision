@@ -1,18 +1,29 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getFoldersOrFilesList } from "@/helpers/api.helpers";
+import { usePathname, useRouter } from "next/navigation";
+
+import { Checkbox } from "@mui/material";
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
+
+import {
+  callPollingApi,
+  getFoldersOrFilesList,
+  initiateDownloadFile,
+} from "@/helpers/api.helpers";
+import { getFilesWithRelativePath } from "@/helpers/general.helpers";
+
 import Body from "@/components/Body";
 import FilesList from "@/components/FilesList";
 import SubHeader from "@/components/SubHeader";
-import { Checkbox } from "@mui/material";
-import { getFilesWithRelativePath } from "@/helpers/general.helpers";
 
 const Images = ({ params: { clientId, projectId, datasetId } }) => {
   // const [filesListResponse, setFilesListResponse] = useState({});
   // const [nextPageToken, setNextPageToken] = useState("");
+  const [downloadApiResponse, setDownloadApiResponse] = useState([]);
+  const [pollingStatusAndResponse, setPollingStatusAndResponse] = useState({});
+  const [intervalIds, setIntervalIds] = useState({});
   const [filesList, setFilesList] = useState([]);
   const [downscaledFolderList, setDownscaledFolderList] = useState([]);
   const [isSelectAll, toggleSelectAll] = useState(false);
@@ -51,6 +62,52 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
   useEffect(() => {
     getFilesList();
   }, []);
+
+  const removeApiFromPollingList = (refId) => {
+    /**
+     * @note - VERY IMPORTANT - Using functional update to ensure access to the latest state
+     */
+    setIntervalIds((prev) => {
+      const copiedIntervalIds = { ...prev };
+      clearInterval(copiedIntervalIds[refId]);
+      delete copiedIntervalIds[refId];
+      return copiedIntervalIds;
+    });
+
+    // setDownloadApiResponse((prev) => {
+    //   const filteredResponse = prev.filter(
+    //     ({ data: { ref } }) => ref === refId
+    //   );
+    //   return filteredResponse;
+    // });
+  };
+
+  const initiatePolling = async (ref) => {
+    const intervalId = setInterval(async () => {
+      const response = await callPollingApi({ refId: ref });
+      const status = response.data.status;
+
+      if (status === "NOT_FOUND" || status === "NO_SUCH_UPLOAD") {
+        removeApiFromPollingList(ref);
+      } else if (status === "PENDING") {
+      } else if (status === "COMPLETED") {
+        removeApiFromPollingList(ref);
+      }
+
+      /**
+       * @note - This will be used to show the status of download to the user.
+       */
+      setPollingStatusAndResponse((prev) => ({
+        ...prev,
+        [ref]: response.data,
+      }));
+    }, 1000);
+
+    /**
+     * @note - Having interval-id based on unique refid of the download request by the user.
+     */
+    setIntervalIds((prev) => ({ ...prev, [ref]: intervalId }));
+  };
 
   const handleFileClick = (e, fileId) => {
     e.preventDefault();
@@ -106,6 +163,21 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
     }
   };
 
+  const handleSelectedFilesDownload = async () => {
+    // FIXME: EFFICIENT METHOD
+    const selectedFilesList = Object.entries(selectedFiles)
+      .filter(([key, value]) => value === true)
+      .map(([key, value]) => key);
+
+    /**
+     * @note - Download and save the response in array, as might need to poll for multiple downloads.
+     */
+    const response = await initiateDownloadFile({ files: selectedFilesList });
+    setDownloadApiResponse((prev) => [...prev, response]);
+
+    initiatePolling(response.data?.ref);
+  };
+
   return (
     <div className="flex flex-col gap-8 items-start w-full">
       <Body
@@ -117,7 +189,11 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
       <div className="flex flex-col gap-4 w-full">
         <div className="flex justify-between pr-4">
           <SubHeader text="Images" />
-          <Checkbox onClick={handleToggleSelectAll} checked={isSelectAll} />
+
+          <div className="flex items-center gap-4">
+            <DownloadRoundedIcon onClick={handleSelectedFilesDownload} />
+            <Checkbox onClick={handleToggleSelectAll} checked={isSelectAll} />
+          </div>
         </div>
 
         <FilesList
