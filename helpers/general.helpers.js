@@ -5,7 +5,7 @@ const getFileOrFolderPath = (filesFolderName = "", indexToPick = 0) => {
 
 export const getFilesWithRelativePath = (filesList, indexToPick) =>
   filesList.map((completePath) => {
-    return getFileOrFolderPath(completePath, indexToPick);
+    return [getFileOrFolderPath(completePath, indexToPick), completePath];
   });
 
 export const getDummyFileName = () => {

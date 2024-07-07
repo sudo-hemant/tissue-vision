@@ -1,11 +1,20 @@
+import { useRef, useState } from "react";
+
 import Popover from "@mui/material/Popover";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useRef, useState } from "react";
-import { Typography } from "@mui/material";
 
-const Folder = ({ text, onClick }) => {
+import usePolling from "@/hooks/usePolling";
+import { callPollingApi, initiateDownloadFile } from "@/helpers/api.helpers";
+
+const Folder = ({ text, onClick, completePath }) => {
+  console.log("🚀 ~ Folder ~ completePath:", text, completePath);
+
   const [isPopoverOpen, togglePopover] = useState(false);
   const anchorRef = useRef(null);
+
+  // FIXME: - MOVE TO TOP MOST PARENT TO ACCESS STATUS IN ANY CHILD
+  const { initiatePolling, pollingStatusAndResponse } =
+    usePolling(callPollingApi);
 
   const handleMoreVertIconClick = (e) => {
     e.preventDefault();
@@ -14,10 +23,11 @@ const Folder = ({ text, onClick }) => {
     togglePopover((prev) => !prev);
   };
 
-  const handleDownloadFolder = (e) => {
-    e.preventDefault();
+  const handleDownloadFolder = async (e) => {
+    togglePopover((prev) => !prev);
 
-    // FIXME: API CALL
+    const response = await initiateDownloadFile({ folderName: completePath });
+    initiatePolling(response.data?.ref);
   };
 
   return (
@@ -55,7 +65,7 @@ const Folder = ({ text, onClick }) => {
       >
         <button
           onClick={handleDownloadFolder}
-          className="text-base text-start px-4 py-2 hover:bg-gray-100 cursor-pointer"
+          className="text-base text-start px-4 py-2 w-full hover:bg-gray-100 cursor-pointer"
         >
           Download
         </button>

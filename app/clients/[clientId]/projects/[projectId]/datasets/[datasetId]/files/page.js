@@ -17,17 +17,17 @@ import { getFilesWithRelativePath } from "@/helpers/general.helpers";
 import Body from "@/components/Body";
 import FilesList from "@/components/FilesList";
 import SubHeader from "@/components/SubHeader";
+import usePolling from "@/hooks/usePolling";
 
 const Images = ({ params: { clientId, projectId, datasetId } }) => {
-  // const [filesListResponse, setFilesListResponse] = useState({});
-  // const [nextPageToken, setNextPageToken] = useState("");
-  const [downloadApiResponse, setDownloadApiResponse] = useState([]);
-  const [pollingStatusAndResponse, setPollingStatusAndResponse] = useState({});
-  const [intervalIds, setIntervalIds] = useState({});
+  // const [downloadApiResponse, setDownloadApiResponse] = useState([]);
   const [filesList, setFilesList] = useState([]);
   const [downscaledFolderList, setDownscaledFolderList] = useState([]);
   const [isSelectAll, toggleSelectAll] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState({});
+
+  const { initiatePolling, pollingStatusAndResponse } =
+    usePolling(callPollingApi);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -38,18 +38,18 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
       pageToken: pageToken,
     });
 
-    // setFilesListResponse(response);
-    // setNextPageToken(response.data?.nextContinuationToken);
-
     const nextContinuationToken = response.data?.nextContinuationToken;
-    const downscaledFolderList = response.data?.subFolders;
+    const downscaledFolderList = getFilesWithRelativePath(
+      response.data?.subFolders,
+      3
+    );
     const filesWithRelativePath = getFilesWithRelativePath(
       response.data?.keys,
       3
     );
 
     setFilesList((files) => [...files, ...filesWithRelativePath]);
-    setDownscaledFolderList(() => [...downscaledFolderList]);
+    setDownscaledFolderList(() => downscaledFolderList);
 
     /**
      * @note - If nextpageToken is available, get the remaining files/downsclaed-folders.
@@ -62,52 +62,6 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
   useEffect(() => {
     getFilesList();
   }, []);
-
-  const removeApiFromPollingList = (refId) => {
-    /**
-     * @note - VERY IMPORTANT - Using functional update to ensure access to the latest state
-     */
-    setIntervalIds((prev) => {
-      const copiedIntervalIds = { ...prev };
-      clearInterval(copiedIntervalIds[refId]);
-      delete copiedIntervalIds[refId];
-      return copiedIntervalIds;
-    });
-
-    // setDownloadApiResponse((prev) => {
-    //   const filteredResponse = prev.filter(
-    //     ({ data: { ref } }) => ref === refId
-    //   );
-    //   return filteredResponse;
-    // });
-  };
-
-  const initiatePolling = async (ref) => {
-    const intervalId = setInterval(async () => {
-      const response = await callPollingApi({ refId: ref });
-      const status = response.data.status;
-
-      if (status === "NOT_FOUND" || status === "NO_SUCH_UPLOAD") {
-        removeApiFromPollingList(ref);
-      } else if (status === "PENDING") {
-      } else if (status === "COMPLETED") {
-        removeApiFromPollingList(ref);
-      }
-
-      /**
-       * @note - This will be used to show the status of download to the user.
-       */
-      setPollingStatusAndResponse((prev) => ({
-        ...prev,
-        [ref]: response.data,
-      }));
-    }, 1000);
-
-    /**
-     * @note - Having interval-id based on unique refid of the download request by the user.
-     */
-    setIntervalIds((prev) => ({ ...prev, [ref]: intervalId }));
-  };
 
   const handleFileClick = (e, fileId) => {
     e.preventDefault();
@@ -137,7 +91,7 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
          * @note - select all case
          */
         setSelectedFiles(
-          filesList.reduce((acc, fileId) => {
+          filesList.reduce((acc, [fileId]) => {
             acc[fileId] = true;
             return acc;
           }, {})
@@ -173,9 +127,8 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
      * @note - Download and save the response in array, as might need to poll for multiple downloads.
      */
     const response = await initiateDownloadFile({ files: selectedFilesList });
-    setDownloadApiResponse((prev) => [...prev, response]);
-
     initiatePolling(response.data?.ref);
+    // setDownloadApiResponse((prev) => [...prev, response]);
   };
 
   return (

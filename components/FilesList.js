@@ -8,7 +8,7 @@ const FilesList = ({
 }) => {
   return (
     <div className="flex flex-wrap gap-4">
-      {filesList.map((relativePath) => (
+      {filesList.map(([relativePath]) => (
         <File
           key={relativePath}
           text={relativePath}
