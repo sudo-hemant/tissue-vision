@@ -47,3 +47,18 @@ export const callPollingApi = async ({ refId = "" } = {}) => {
     return { status: 404, message: err.message };
   }
 };
+
+export const downloadFile = async ({ fileKey = "" } = {}) => {
+  try {
+    const response = await axios.get(`${AWS_BASE_URL}/download/url`, {
+      params: {
+        key: fileKey,
+        isZip: true,
+      },
+    });
+
+    return { status: 200, data: response.data.data };
+  } catch (err) {
+    return { status: 404, message: err.message };
+  }
+};

@@ -7,8 +7,6 @@ import usePolling from "@/hooks/usePolling";
 import { callPollingApi, initiateDownloadFile } from "@/helpers/api.helpers";
 
 const Folder = ({ text, onClick, completePath }) => {
-  console.log("🚀 ~ Folder ~ completePath:", text, completePath);
-
   const [isPopoverOpen, togglePopover] = useState(false);
   const anchorRef = useRef(null);
 

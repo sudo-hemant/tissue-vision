@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { downloadFile } from "@/helpers/api.helpers";
+
 const usePolling = (pollingApiFn, pollingInterval = 1000) => {
   const [pollingStatusAndResponse, setPollingStatusAndResponse] = useState({});
   const [intervalIds, setIntervalIds] = useState({});
@@ -11,22 +13,25 @@ const usePolling = (pollingApiFn, pollingInterval = 1000) => {
     };
   }, []);
 
+  const removeInterval = (refId) => {
+    setIntervalIds((prev) => {
+      const copiedIntervalIds = { ...prev };
+      clearInterval(copiedIntervalIds[refId]);
+      delete copiedIntervalIds[refId];
+      return copiedIntervalIds;
+    });
+  };
+
   const initiatePolling = async (refId) => {
     const intervalId = setInterval(async () => {
       const response = await pollingApiFn({ refId: refId });
       const status = response.data.status;
 
-      if (
-        status === "COMPLETED" ||
-        status === "NOT_FOUND" ||
-        status === "NO_SUCH_UPLOAD"
-      ) {
-        setIntervalIds((prev) => {
-          const copiedIntervalIds = { ...prev };
-          clearInterval(copiedIntervalIds[refId]);
-          delete copiedIntervalIds[refId];
-          return copiedIntervalIds;
-        });
+      if (status === "NOT_FOUND" || status === "NO_SUCH_UPLOAD") {
+        removeInterval(refId);
+      } else if (status === "COMPLETED") {
+        downloadFile({ fileKey: refId });
+        removeInterval(refId);
       } else if (status === "PENDING") {
         // CONTINUE - keep polling
       }

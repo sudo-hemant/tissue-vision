@@ -123,6 +123,11 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
       .filter(([key, value]) => value === true)
       .map(([key, value]) => key);
 
+    if (!selectedFilesList.length) {
+      // TODO: Display a message to select files
+      return;
+    }
+
     /**
      * @note - Download and save the response in array, as might need to poll for multiple downloads.
      */
