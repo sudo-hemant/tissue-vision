@@ -1,33 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { usePathname, useRouter } from "next/navigation";
 
 import { Checkbox } from "@mui/material";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
-import {
-  callPollingApi,
-  getFoldersOrFilesList,
-  initiateDownloadFile,
-} from "@/helpers/api.helpers";
+import { PollingContext } from "@/contexts/pollingContext";
+import { getFoldersOrFilesList } from "@/helpers/api.helpers";
 import { getFilesWithRelativePath } from "@/helpers/general.helpers";
 
 import Body from "@/components/Body";
 import FilesList from "@/components/FilesList";
 import SubHeader from "@/components/SubHeader";
-import usePolling from "@/hooks/usePolling";
 
 const Images = ({ params: { clientId, projectId, datasetId } }) => {
-  // const [downloadApiResponse, setDownloadApiResponse] = useState([]);
   const [filesList, setFilesList] = useState([]);
   const [downscaledFolderList, setDownscaledFolderList] = useState([]);
   const [isSelectAll, toggleSelectAll] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState({});
 
-  const { initiatePolling, pollingStatusAndResponse } =
-    usePolling(callPollingApi);
+  const { initiateDownload } = useContext(PollingContext);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -128,12 +122,7 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
       return;
     }
 
-    /**
-     * @note - Download and save the response in array, as might need to poll for multiple downloads.
-     */
-    const response = await initiateDownloadFile({ files: selectedFilesList });
-    initiatePolling(response.data?.ref);
-    // setDownloadApiResponse((prev) => [...prev, response]);
+    initiateDownload({ files: selectedFilesList });
   };
 
   return (

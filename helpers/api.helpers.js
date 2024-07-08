@@ -18,7 +18,7 @@ export const getFoldersOrFilesList = async ({
   }
 };
 
-export const initiateDownloadFile = async ({
+export const initiateDownloadZipping = async ({
   files = [],
   folderName = "",
   zipFileName = getDummyFileName(),

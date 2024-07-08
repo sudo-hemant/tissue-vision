@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 
 import { downloadFile } from "@/helpers/api.helpers";
+import { downloadFileInNewTab } from "@/helpers/general.helpers";
 
-const usePolling = (pollingApiFn, pollingInterval = 1000) => {
+const usePolling = ({
+  downloadApiFn,
+  pollingApiFn,
+  pollingInterval = 1000,
+}) => {
+  const [downloadApiResponse, setDownloadApiResponse] = useState([]);
   const [pollingStatusAndResponse, setPollingStatusAndResponse] = useState({});
   const [intervalIds, setIntervalIds] = useState({});
 
@@ -30,10 +36,16 @@ const usePolling = (pollingApiFn, pollingInterval = 1000) => {
       if (status === "NOT_FOUND" || status === "NO_SUCH_UPLOAD") {
         removeInterval(refId);
       } else if (status === "COMPLETED") {
-        downloadFile({ fileKey: refId });
         removeInterval(refId);
+
+        const downloadFileResponse = await downloadFile({ fileKey: refId });
+        const downloadUrl = downloadFileResponse.data?.url;
+
+        await downloadFileInNewTab(downloadUrl);
       } else if (status === "PENDING") {
-        // CONTINUE - keep polling
+        /**
+         * @note - CONTINUE - keep polling
+         */
       }
 
       setPollingStatusAndResponse((prev) => ({
@@ -45,7 +57,21 @@ const usePolling = (pollingApiFn, pollingInterval = 1000) => {
     setIntervalIds((prev) => ({ ...prev, [refId]: intervalId }));
   };
 
-  return { initiatePolling, pollingStatusAndResponse };
+  const initiateDownload = async ({ files = [], folderName = "" }) => {
+    const response = await downloadApiFn({ files, folderName });
+
+    const uniqueRefId = response.data?.ref;
+
+    initiatePolling(uniqueRefId);
+    setDownloadApiResponse((prev) => [...prev, response]);
+  };
+
+  return {
+    downloadApiResponse,
+    initiateDownload,
+    // initiatePolling,
+    pollingStatusAndResponse,
+  };
 };
 
 export default usePolling;

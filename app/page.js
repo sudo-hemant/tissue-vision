@@ -4,13 +4,12 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { getFoldersOrFilesList } from "@/helpers/api.helpers";
 import { getFilesWithRelativePath } from "@/helpers/general.helpers";
+import { getFoldersOrFilesList } from "@/helpers/api.helpers";
 
 import Body from "@/components/Body";
 
 const Clients = () => {
-  // const [response, setResponse] = useState({});
   const [clientsList, setClientsList] = useState([]);
 
   const router = useRouter();
@@ -44,7 +43,6 @@ const Clients = () => {
 
   const handleClientClick = (e, client) => {
     e.preventDefault();
-
     router.push(`/clients/${client}/projects`);
   };
 

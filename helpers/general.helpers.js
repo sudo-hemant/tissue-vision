@@ -20,3 +20,25 @@ export const getDummyFileName = () => {
 
   return `file_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.zip`;
 };
+
+export const downloadFileInNewTab = async (url) => {
+  try {
+    const newTab = window.open(url, "_blank");
+
+    /**
+     * @note - Ensure the tab was opened successfully.
+     *         Set a timeout to close the new tab after the download starts.
+     */
+    if (newTab) {
+      setTimeout(() => {
+        newTab.close();
+      }, 5000);
+    } else {
+      // TODO: NOTIFICATION
+      console.error("Failed to open new tab");
+    }
+  } catch (error) {
+    // TODO: NOTIFICATION
+    console.error("Error downloading file:", error);
+  }
+};

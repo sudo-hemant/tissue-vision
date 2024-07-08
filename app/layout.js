@@ -1,8 +1,9 @@
-// import { Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 
+import PollingProvider from "@/contexts/PollingProvider";
 import "./globals.css";
 
-// const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Create Next App",
@@ -12,8 +13,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      {/* <body className={inter.className}> */}
-      <body className="">
+      <body className={inter.className}>
+        {/* <body className=""> */}
         <nav className="flex justify-between w-full px-12 py-4 h-16 bg-gray-300 text-gray-900 text-xl font-semibold">
           <div>Project Drive</div>
 
@@ -31,7 +32,7 @@ export default function RootLayout({ children }) {
         </nav>
 
         <main className="flex min-h-screen flex-col items-center justify-between p-8 bg-gray-100">
-          {children}
+          <PollingProvider>{children}</PollingProvider>
         </main>
       </body>
     </html>

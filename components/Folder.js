@@ -1,18 +1,15 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 
 import Popover from "@mui/material/Popover";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-import usePolling from "@/hooks/usePolling";
-import { callPollingApi, initiateDownloadFile } from "@/helpers/api.helpers";
+import { PollingContext } from "@/contexts/pollingContext";
 
 const Folder = ({ text, onClick, completePath }) => {
   const [isPopoverOpen, togglePopover] = useState(false);
   const anchorRef = useRef(null);
 
-  // FIXME: - MOVE TO TOP MOST PARENT TO ACCESS STATUS IN ANY CHILD
-  const { initiatePolling, pollingStatusAndResponse } =
-    usePolling(callPollingApi);
+  const { initiateDownload } = useContext(PollingContext);
 
   const handleMoreVertIconClick = (e) => {
     e.preventDefault();
@@ -24,8 +21,7 @@ const Folder = ({ text, onClick, completePath }) => {
   const handleDownloadFolder = async (e) => {
     togglePopover((prev) => !prev);
 
-    const response = await initiateDownloadFile({ folderName: completePath });
-    initiatePolling(response.data?.ref);
+    initiateDownload({ folderName: completePath });
   };
 
   return (
