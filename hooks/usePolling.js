@@ -17,6 +17,9 @@ const usePolling = ({
   cancelApiFn,
 }) => {
   const [zippingApiResponse, setZippingApiResponse] = useState([]);
+  /**
+   * @note - DUMMY DATA - uncomment to see a sample data.
+   */
   // const [zippingApiResponse, setZippingApiResponse] = useState([
   //   {
   //     data: {
@@ -105,7 +108,6 @@ const usePolling = ({
 
   const cancelDownload = async ({ refId, zipKey }) => {
     const response = await cancelApiFn({ refId, zipKey });
-    console.log("🚀 ~ cancelDownload ~ response:", response);
 
     if (response.status === 200) {
       setPollingStatusAndResponse((prev) => ({

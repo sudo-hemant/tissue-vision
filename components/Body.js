@@ -1,5 +1,5 @@
 import FolderList from "./FolderList";
-import LoadMore from "./LoadMore";
+// import LoadMore from "./LoadMore";
 import Loading from "./Loading";
 import SubHeader from "./SubHeader";
 
@@ -11,8 +11,8 @@ const Body = ({
   handleFolderClick,
   onBackBtnClick,
   showBackBtn,
-  nextPageToken,
-  onLoadMoreClick,
+  // nextPageToken,
+  // onLoadMoreClick,
 }) => {
   return (
     <div className="flex flex-col gap-4 md:gap-6 w-full">
@@ -28,7 +28,7 @@ const Body = ({
         <FolderList dataList={dataList} handleFolderClick={handleFolderClick} />
       )}
 
-      {nextPageToken && <LoadMore onClick={onLoadMoreClick} />}
+      {/* {nextPageToken && <LoadMore onClick={onLoadMoreClick} />} */}
 
       {children}
     </div>

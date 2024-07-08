@@ -20,4 +20,5 @@ const LoadMore = ({ onClick }) => {
     </>
   );
 };
+
 export default LoadMore;
