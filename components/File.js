@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 
 import { Checkbox } from "@mui/material";
 
-const File = ({ text, onClick, updateSelectedFiles, isSelected }) => {
+const File = ({
+  text = "",
+  onClick = () => {},
+  updateSelectedFiles = () => {},
+  isSelected,
+}) => {
   const [selected, toggleSelected] = useState(false);
 
   useEffect(() => {

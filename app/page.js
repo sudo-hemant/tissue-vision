@@ -10,31 +10,18 @@ import { getFoldersOrFilesList } from "@/helpers/api.helpers";
 import Body from "@/components/Body";
 
 const Clients = () => {
+  const [loading, setLoading] = useState(true);
   const [clientsList, setClientsList] = useState([]);
 
   const router = useRouter();
 
   const getClientsList = async () => {
+    setLoading(true);
     const response = await getFoldersOrFilesList();
     const subFolders = getFilesWithRelativePath(response.data?.subFolders, 0);
 
-    // setResponse(response);
     setClientsList(subFolders);
-
-    // FIXME: TEMPORARY
-    setClientsList((a) => [
-      ...a,
-      ["ACT-002/", "ACT-002/"],
-      ["ACT-003/", "ACT-003/"],
-      ["ACT-004/", "ACT-004/"],
-      ["ACT-005/", "ACT-005/"],
-      ["ACT-006/", "ACT-006/"],
-      ["ACT-007/", "ACT-007/"],
-      ["ACT-008/", "ACT-008/"],
-      ["ACT-009/", "ACT-009/"],
-      ["ACT-010/", "ACT-010/"],
-      ["ACT-011/", "ACT-011/"],
-    ]);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -48,6 +35,7 @@ const Clients = () => {
 
   return (
     <Body
+      loading={loading}
       subHeaderText="Clients"
       dataList={clientsList}
       handleFolderClick={handleClientClick}

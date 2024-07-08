@@ -16,6 +16,7 @@ import FilesList from "@/components/FilesList";
 import SubHeader from "@/components/SubHeader";
 
 const Images = ({ params: { clientId, projectId, datasetId } }) => {
+  const [loading, setLoading] = useState(true);
   const [filesList, setFilesList] = useState([]);
   const [downscaledFolderList, setDownscaledFolderList] = useState([]);
   const [isSelectAll, toggleSelectAll] = useState(false);
@@ -27,6 +28,8 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
   const pathname = usePathname();
 
   const getFilesList = async (pageToken = "") => {
+    setLoading(true);
+
     const response = await getFoldersOrFilesList({
       prefix: `${clientId}/${projectId}/${datasetId}`,
       pageToken: pageToken,
@@ -47,8 +50,8 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
       const updatedFilesList = [...files, ...filesWithRelativePath];
       return [...new Set(updatedFilesList)];
     });
-
     setDownscaledFolderList(() => downscaledFolderList);
+    setLoading(false);
 
     /**
      * @note - If nextpageToken is available, get the remaining files/downsclaed-folders.
@@ -132,23 +135,36 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
 
   return (
     <div className="flex flex-col gap-8 items-start w-full">
+      {/* @note - DownScaled Images folder */}
       <Body
         subHeaderText="DownScaled Images"
+        loading={loading}
+        onBackBtnClick={router.back}
+        showBackBtn
         dataList={downscaledFolderList}
         handleFolderClick={handleFolderClick}
       />
 
       <div className="flex flex-col gap-4 w-full">
         <div className="flex justify-between pr-4">
-          <SubHeader text="Images" />
+          <SubHeader text="Images" onBackBtnClick={router.back} showBackBtn />
 
+          {/* @note - In case of no data - hide checkbox and download icon */}
           <div className="flex items-center gap-4">
-            <DownloadRoundedIcon onClick={handleSelectedFilesDownload} />
-            <Checkbox onClick={handleToggleSelectAll} checked={isSelectAll} />
+            {filesList.length ? (
+              <>
+                <DownloadRoundedIcon onClick={handleSelectedFilesDownload} />
+                <Checkbox
+                  onClick={handleToggleSelectAll}
+                  checked={isSelectAll}
+                />
+              </>
+            ) : null}
           </div>
         </div>
 
         <FilesList
+          loading={loading}
           filesList={filesList}
           handleFileClick={handleFileClick}
           updateSelectedFiles={updateSelectedFiles}

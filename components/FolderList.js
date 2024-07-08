@@ -1,16 +1,20 @@
 import Folder from "./Folder";
 
-const FolderList = ({ dataList, handleFolderClick }) => {
+const FolderList = ({ dataList = [], handleFolderClick = () => {} }) => {
   return (
     <div className="flex flex-wrap gap-4">
-      {dataList.map(([relativePath, completePath]) => (
-        <Folder
-          key={relativePath}
-          text={relativePath}
-          completePath={completePath}
-          onClick={handleFolderClick}
-        />
-      ))}
+      {dataList.length ? (
+        dataList.map(([relativePath, completePath]) => (
+          <Folder
+            key={relativePath}
+            text={relativePath}
+            completePath={completePath}
+            onClick={handleFolderClick}
+          />
+        ))
+      ) : (
+        <div> No data found </div>
+      )}
     </div>
   );
 };

@@ -10,20 +10,21 @@ import { getFilesWithRelativePath } from "@/helpers/general.helpers";
 import Body from "@/components/Body";
 
 const Datasets = ({ params: { clientId, projectId } }) => {
-  // const [response, setResponse] = useState({});
+  const [loading, setLoading] = useState(true);
   const [datasetsList, setDatasetsList] = useState([]);
 
   const router = useRouter();
   const pathname = usePathname();
 
   const getDatasetsList = async () => {
+    setLoading(true);
     const response = await getFoldersOrFilesList({
       prefix: `${clientId}/${projectId}`,
     });
     const subFolders = getFilesWithRelativePath(response.data?.subFolders, 2);
 
-    // setResponse(response);
     setDatasetsList(subFolders);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -32,13 +33,15 @@ const Datasets = ({ params: { clientId, projectId } }) => {
 
   const handleDatasetClick = (e, datasetId) => {
     e.preventDefault();
-
     router.push(`${pathname}/${datasetId}/files`);
   };
 
   return (
     <Body
       subHeaderText="Datasets"
+      loading={loading}
+      onBackBtnClick={router.back}
+      showBackBtn
       dataList={datasetsList}
       handleFolderClick={handleDatasetClick}
     />

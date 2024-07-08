@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { downloadFile } from "@/helpers/api.helpers";
 import { downloadFileInNewTab } from "@/helpers/general.helpers";
 import {
+  ABORTED,
   COMPLETED,
   NOT_FOUND,
   NO_SUCH_UPLOAD,
@@ -10,15 +11,16 @@ import {
 } from "@/constants/general.constants";
 
 const usePolling = ({
-  downloadApiFn,
+  zippingApiFn,
   pollingApiFn,
   pollingInterval = 1000,
+  cancelApiFn,
 }) => {
   const [zippingApiResponse, setZippingApiResponse] = useState([]);
   // const [zippingApiResponse, setZippingApiResponse] = useState([
   //   {
   //     data: {
-  //       zipFileName: "File 1",
+  //       zipFilename: "File 1",
   //       ref: "ref1",
   //     },
   //     status: "PENDING",
@@ -93,7 +95,7 @@ const usePolling = ({
   };
 
   const initiateZipping = async ({ files = [], folderName = "" }) => {
-    const response = await downloadApiFn({ files, folderName });
+    const response = await zippingApiFn({ files, folderName });
 
     const uniqueRefId = response.data?.ref;
 
@@ -101,7 +103,23 @@ const usePolling = ({
     setZippingApiResponse((prev) => [...prev, response]);
   };
 
+  const cancelDownload = async ({ refId, zipKey }) => {
+    const response = await cancelApiFn({ refId, zipKey });
+    console.log("🚀 ~ cancelDownload ~ response:", response);
+
+    if (response.status === 200) {
+      setPollingStatusAndResponse((prev) => ({
+        ...prev,
+        [refId]: { status: ABORTED },
+      }));
+
+      removeInterval(refId);
+      removeZippingResponseHistory(refId);
+    }
+  };
+
   return {
+    cancelDownload,
     zippingApiResponse,
     initiateZipping,
     pollingStatusAndResponse,
