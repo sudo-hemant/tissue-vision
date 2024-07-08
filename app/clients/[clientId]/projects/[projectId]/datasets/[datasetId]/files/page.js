@@ -21,7 +21,7 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
   const [isSelectAll, toggleSelectAll] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState({});
 
-  const { initiateDownload } = useContext(PollingContext);
+  const { initiateZipping } = useContext(PollingContext);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -42,7 +42,12 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
       3
     );
 
-    setFilesList((files) => [...files, ...filesWithRelativePath]);
+    setFilesList((files) => {
+      // FIXME: DUPLICATE ISSUES
+      const updatedFilesList = [...files, ...filesWithRelativePath];
+      return [...new Set(updatedFilesList)];
+    });
+
     setDownscaledFolderList(() => downscaledFolderList);
 
     /**
@@ -122,7 +127,7 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
       return;
     }
 
-    initiateDownload({ files: selectedFilesList });
+    initiateZipping({ files: selectedFilesList });
   };
 
   return (

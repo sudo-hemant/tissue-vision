@@ -1,10 +1,11 @@
 "use client";
 
+import DownloadProgressBar from "@/components/DownloadProgressBar";
 import PollingProvider from "@/contexts/PollingProvider";
 
 const MyApp = ({ children }) => {
   return (
-    <div className="">
+    <div className="min-h-screen bg-gray-100">
       <nav className="flex justify-between w-full px-12 py-4 h-16 bg-gray-300 text-gray-900 text-xl font-semibold">
         <div>Project Drive</div>
 
@@ -20,10 +21,13 @@ const MyApp = ({ children }) => {
           </li>
         </ul>
       </nav>
-      <div className="flex min-h-screen flex-col items-center justify-between p-8 bg-gray-100">
-        <PollingProvider>{children}</PollingProvider>
+      <div className="flex flex-col items-center justify-between p-8 ">
+        <PollingProvider>
+          <DownloadProgressBar />
+
+          {children}
+        </PollingProvider>
       </div>
-      ;
     </div>
   );
 };

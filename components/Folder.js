@@ -9,7 +9,7 @@ const Folder = ({ text, onClick, completePath }) => {
   const [isPopoverOpen, togglePopover] = useState(false);
   const anchorRef = useRef(null);
 
-  const { initiateDownload } = useContext(PollingContext);
+  const { initiateZipping } = useContext(PollingContext);
 
   const handleMoreVertIconClick = (e) => {
     e.preventDefault();
@@ -21,7 +21,7 @@ const Folder = ({ text, onClick, completePath }) => {
   const handleDownloadFolder = async (e) => {
     togglePopover((prev) => !prev);
 
-    initiateDownload({ folderName: completePath });
+    initiateZipping({ folderName: completePath });
   };
 
   return (

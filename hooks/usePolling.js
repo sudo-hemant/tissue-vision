@@ -2,13 +2,29 @@ import { useEffect, useState } from "react";
 
 import { downloadFile } from "@/helpers/api.helpers";
 import { downloadFileInNewTab } from "@/helpers/general.helpers";
+import {
+  COMPLETED,
+  NOT_FOUND,
+  NO_SUCH_UPLOAD,
+  PENDING,
+} from "@/constants/general.constants";
 
 const usePolling = ({
   downloadApiFn,
   pollingApiFn,
   pollingInterval = 1000,
 }) => {
-  const [downloadApiResponse, setDownloadApiResponse] = useState([]);
+  const [zippingApiResponse, setZippingApiResponse] = useState([]);
+  // const [zippingApiResponse, setZippingApiResponse] = useState([
+  //   {
+  //     data: {
+  //       zipFileName: "File 1",
+  //       ref: "ref1",
+  //     },
+  //     status: "PENDING",
+  //   },
+  // ]);
+
   const [pollingStatusAndResponse, setPollingStatusAndResponse] = useState({});
   const [intervalIds, setIntervalIds] = useState({});
 
@@ -28,21 +44,40 @@ const usePolling = ({
     });
   };
 
+  const removeZippingResponseHistory = (refId) => {
+    /**
+     * @note - Remove the Download History from the response, after a particular interval.
+     */
+    setTimeout(() => {
+      setZippingApiResponse((prev) => {
+        const newArray = [...prev];
+        newArray.splice(
+          newArray.findIndex((item) => item?.data?.refId === refId),
+          1
+        );
+        return newArray;
+      });
+    }, 10000);
+  };
+
   const initiatePolling = async (refId) => {
     const intervalId = setInterval(async () => {
       const response = await pollingApiFn({ refId: refId });
       const status = response.data?.status;
 
-      if (status === "NOT_FOUND" || status === "NO_SUCH_UPLOAD") {
+      if (status === NOT_FOUND || status === NO_SUCH_UPLOAD) {
         removeInterval(refId);
-      } else if (status === "COMPLETED") {
+        removeZippingResponseHistory(refId);
+      } else if (status === COMPLETED) {
         removeInterval(refId);
 
+        // FIXME: API FN FROM PROPS
         const downloadFileResponse = await downloadFile({ fileKey: refId });
         const downloadUrl = downloadFileResponse.data?.url;
-
         await downloadFileInNewTab(downloadUrl);
-      } else if (status === "PENDING") {
+
+        removeZippingResponseHistory(refId);
+      } else if (status === PENDING) {
         /**
          * @note - CONTINUE - keep polling
          */
@@ -57,19 +92,18 @@ const usePolling = ({
     setIntervalIds((prev) => ({ ...prev, [refId]: intervalId }));
   };
 
-  const initiateDownload = async ({ files = [], folderName = "" }) => {
+  const initiateZipping = async ({ files = [], folderName = "" }) => {
     const response = await downloadApiFn({ files, folderName });
 
     const uniqueRefId = response.data?.ref;
 
     initiatePolling(uniqueRefId);
-    setDownloadApiResponse((prev) => [...prev, response]);
+    setZippingApiResponse((prev) => [...prev, response]);
   };
 
   return {
-    downloadApiResponse,
-    initiateDownload,
-    // initiatePolling,
+    zippingApiResponse,
+    initiateZipping,
     pollingStatusAndResponse,
   };
 };

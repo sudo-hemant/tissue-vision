@@ -7,8 +7,8 @@ import { PollingContext } from "./pollingContext";
 
 const PollingProvider = ({ children }) => {
   const {
-    downloadApiResponse,
-    initiateDownload,
+    zippingApiResponse,
+    initiateZipping,
     // initiatePolling,
     pollingStatusAndResponse,
   } = usePolling({
@@ -19,8 +19,8 @@ const PollingProvider = ({ children }) => {
   return (
     <PollingContext.Provider
       value={{
-        downloadApiResponse,
-        initiateDownload,
+        zippingApiResponse,
+        initiateZipping,
         // initiatePolling,
         pollingStatusAndResponse,
       }}
