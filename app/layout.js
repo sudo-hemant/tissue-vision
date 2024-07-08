@@ -1,7 +1,8 @@
 import { Inter } from "next/font/google";
 
-import PollingProvider from "@/contexts/PollingProvider";
 import "./globals.css";
+
+import App from "./_app";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         {/* <body className=""> */}
-        <nav className="flex justify-between w-full px-12 py-4 h-16 bg-gray-300 text-gray-900 text-xl font-semibold">
+        {/* <nav className="flex justify-between w-full px-12 py-4 h-16 bg-gray-300 text-gray-900 text-xl font-semibold">
           <div>Project Drive</div>
 
           <ul className="flex gap-8 justify-end ">
@@ -29,10 +30,10 @@ export default function RootLayout({ children }) {
               <a href="#">Contact</a>
             </li>
           </ul>
-        </nav>
+        </nav> */}
 
-        <main className="flex min-h-screen flex-col items-center justify-between p-8 bg-gray-100">
-          <PollingProvider>{children}</PollingProvider>
+        <main className="">
+          <App>{children}</App>
         </main>
       </body>
     </html>

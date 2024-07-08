@@ -3,7 +3,7 @@ const getFileOrFolderPath = (filesFolderName = "", indexToPick = 0) => {
   return splittedFolderName[indexToPick];
 };
 
-export const getFilesWithRelativePath = (filesList, indexToPick) =>
+export const getFilesWithRelativePath = (filesList = [], indexToPick = 0) =>
   filesList.map((completePath) => {
     return [getFileOrFolderPath(completePath, indexToPick), completePath];
   });
@@ -21,7 +21,7 @@ export const getDummyFileName = () => {
   return `file_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.zip`;
 };
 
-export const downloadFileInNewTab = async (url) => {
+export const downloadFileInNewTab = async (url = "") => {
   try {
     const newTab = window.open(url, "_blank");
 

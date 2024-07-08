@@ -31,7 +31,7 @@ const usePolling = ({
   const initiatePolling = async (refId) => {
     const intervalId = setInterval(async () => {
       const response = await pollingApiFn({ refId: refId });
-      const status = response.data.status;
+      const status = response.data?.status;
 
       if (status === "NOT_FOUND" || status === "NO_SUCH_UPLOAD") {
         removeInterval(refId);
