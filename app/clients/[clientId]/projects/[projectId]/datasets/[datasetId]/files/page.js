@@ -146,12 +146,12 @@ const Images = ({ params: { clientId, projectId, datasetId } }) => {
       />
 
       <div className="flex flex-col gap-4 w-full">
-        <div className="flex justify-between pr-4">
-          <SubHeader text="Images" onBackBtnClick={router.back} showBackBtn />
+        <div className="flex justify-between pr-2 md:pr-4">
+          <SubHeader text="Images" />
 
           {/* @note - In case of no data - hide checkbox and download icon */}
           <div className="flex items-center gap-4">
-            {filesList.length ? (
+            {filesList.length > 0 ? (
               <>
                 <DownloadRoundedIcon onClick={handleSelectedFilesDownload} />
                 <Checkbox

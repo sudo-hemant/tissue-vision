@@ -28,11 +28,13 @@ const Folder = ({ text, onClick, completePath }) => {
     <>
       <button
         onClick={(e) => onClick(e, text)}
-        className="flex justify-between p-4 w-80 h-24 bg-gray-300 rounded-3xl"
+        className="flex justify-between p-2 md:p-4 w-full md:w-80 h-16 md:h-24 bg-gray-200 border-[1px] border-gray-300 rounded-2xl md:rounded-3xl"
       >
         <div className="truncate flex flex-col justify-center items-start gap-2 h-full">
-          <div className="text-2xl w-11/12 text-left truncate">{text}</div>
-          <div className="text-base">Created on: April 6, 2024</div>
+          <div className="text-s md:text-2xl w-11/12 text-left truncate">
+            {text}
+          </div>
+          <div className="text-xs md:text-base">Created on: April 6, 2024</div>
         </div>
 
         <MoreVertIcon

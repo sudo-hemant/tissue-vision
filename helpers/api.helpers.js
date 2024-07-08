@@ -64,7 +64,6 @@ export const downloadFile = async ({ fileKey = "" } = {}) => {
 };
 
 export const cancelDownload = async ({ refId = "", zipKey = "" } = {}) => {
-  console.log("🚀 ~ cancelDownload ~ refId:", refId);
   try {
     const response = await axios.delete(`${AWS_BASE_URL}/download/cancel`, {
       data: { refId, zipKey },

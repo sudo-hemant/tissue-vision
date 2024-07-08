@@ -7,7 +7,6 @@ const SubHeader = ({
 }) => {
   return (
     <div className="flex items-center">
-      {/* <h1 className="text-4xl font-semibold px-4"> {text} </h1> */}
       {showBackBtn ? (
         <ArrowBackRoundedIcon
           onClick={onBackBtnClick}
@@ -15,7 +14,8 @@ const SubHeader = ({
           className="cursor-pointer"
         />
       ) : null}
-      <h1 className="text-4xl font-semibold px-4"> {text} </h1>
+
+      <p className="text-2xl md:text-4xl font-semibold"> {text} </p>
     </div>
   );
 };

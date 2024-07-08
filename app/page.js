@@ -12,6 +12,7 @@ import Body from "@/components/Body";
 const Clients = () => {
   const [loading, setLoading] = useState(true);
   const [clientsList, setClientsList] = useState([]);
+  const [nextPageToken, setNextPageToken] = useState("");
 
   const router = useRouter();
 
@@ -19,8 +20,11 @@ const Clients = () => {
     setLoading(true);
     const response = await getFoldersOrFilesList();
     const subFolders = getFilesWithRelativePath(response.data?.subFolders, 0);
+    const nextPageToken = response.data?.nextContinuationToken;
 
-    setClientsList(subFolders);
+    // setNextPageToken(nextPageToken);
+    setNextPageToken("nextPageToken");
+    setClientsList((prev) => [...prev, ...subFolders]);
     setLoading(false);
   };
 
@@ -39,6 +43,8 @@ const Clients = () => {
       subHeaderText="Clients"
       dataList={clientsList}
       handleFolderClick={handleClientClick}
+      nextPageToken={nextPageToken}
+      onLoadMoreClick={getClientsList}
     />
   );
 };

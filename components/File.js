@@ -37,9 +37,9 @@ const File = ({
     //FIXME: BUTTON FOR NOW - as Image is not available.
     <button
       onClick={(e) => onClick(e, text)}
-      className="flex justify-between items-center gap-2 p-4 h-16 w-full bg-gray-300 rounded-3xl text-lg truncate"
+      className="flex justify-between items-center gap-2 p-2 md:p-4 h-12 md:h-16 w-full bg-gray-300 rounded-2xl text-s md:text-lg "
     >
-      <div> {text} </div>
+      <p className="text-left w-10/12 truncate"> {text} </p>
       <Checkbox onClick={handleToggleSelection} checked={selected} />
     </button>
   );
